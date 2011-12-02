@@ -45,13 +45,6 @@ class Server(Resource, threading.Thread):
             else:
                 callback = ''
 
-            #request.setHeader('Access-Control-Allow-Origin', '*')
-            #request.setHeader('Access-Control-Allow-Methods', 'GET')
-            #request.setHeader('Access-Control-Allow-Headers',
-            #               'x-prototype-version,x-requested-with')
-            #request.setHeader('Access-Control-Max-Age', 2520)
-            #request.setHeader('Content-type', 'application/json')
-
             lst = path.split("/")
             base = lst[1]
             args = lst[2:]
@@ -104,11 +97,9 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
 
-        filename = filename + ".gif"
-
-        packets = self.encode_file("static/" + filename)
+        packets = self.encode_file("static/" + filename + ".gif")
         self.write_keystroke_file(filename, json.loads(packets))
-        return ""
+        return filename
         
     def check_existance(self):
         try:
