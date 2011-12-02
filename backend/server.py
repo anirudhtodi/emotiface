@@ -51,7 +51,6 @@ class Server(Resource, threading.Thread):
             args = lst[2:]
 
             if base == 'compilegif':
-                #args = json.decode(request.args["packetlist"])
                 self.compile(request.args)
                 return self.wrap("", callback)
             elif base == "static":
@@ -123,7 +122,7 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
 
-        packets = self.encode_file("static/" + filename + ".gif")
+        packets = self.encode_file(filename)
         return '"'+filename+'"'
         
     def check_existance(self):
@@ -162,7 +161,6 @@ class Server(Resource, threading.Thread):
         """
         Encodes the given file into a JSON encoded set of "packets."
         """
-
         f = open("static/" + filename + ".gif", 'rb')
         
         packets = []
