@@ -63,7 +63,10 @@ function partialFile(filename,totalPackets)
                 //call to local!
 
                 //go call to compile
-                compileFile(this);
+                if(confirm("Compile this on backend?"))
+                {
+                    compileFile(this);
+                }
             }
         }
     }
@@ -95,6 +98,7 @@ function checkCompileDone(returnVal)
     if(!returnVal)
     {
         //not done yet
+        console.log("COMPILE returned this " + returnVal);
         return;
     }
     alert("this compiled on the back end " + returnVal);
@@ -196,7 +200,6 @@ function getGifCallback(rawData)
 
     for(var i = 0; i < rawData.length; i++)
     {
-        alert("adding this number" + i + " and " + rawData[i].seqnum);
         files[fileName].addPacket(rawData[i]);
     }
     console.log(files[fileName]);

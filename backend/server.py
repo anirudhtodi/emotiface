@@ -108,9 +108,13 @@ class Server(Resource, threading.Thread):
             print packets[str(i)]
             print len(packets[str(i)])
             endata = packets[str(i)]
-            #f.write(base64.urlsafe_b64decode(endata))
-            f.write(binascii.a2b_base64(endata))
+            f.write(base64.urlsafe_b64decode(endata))
+            #f.write(binascii.a2b_base64(endata))
             i += 1
+        print "OK I just finished encoding that thing"
+        print "total was " + str(total)
+        print len(packets.keys()), " was keys"
+
         del self.packet_map[uid]
         return "whatt"
 
@@ -184,9 +188,9 @@ class Server(Resource, threading.Thread):
             data = f.read(self.max_payload_size)
             if data == '':
                 break
-            #encoded = base64.urlsafe_b64encode(data)
-            encoded = binascii.b2a_base64(data)
-            encoded = encoded.replace('\n','')
+            encoded = base64.urlsafe_b64encode(data)
+            #encoded = binascii.b2a_base64(data)
+            #encoded = encoded.replace('\n','')
 
             text += encoded
             
