@@ -89,22 +89,40 @@ class Server(Resource, threading.Thread):
         filename = args[0]
         subprocess.check_call(["osascript", "gen.sc"])
         time.sleep(5)
-        self.move_movie()
+        path = self.check_existance()
+        self.block(path)
+        shutil.move(path, "./movie.mov")
+
         movie = "movie.mov"
         subprocess.check_call(['ffmpeg', '-i', movie, '-pix_fmt', 'rgb24', '-s', 'qcif', '-loop_output', '0', 'static/recording.gif'])
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
+
+        filename = filename + ".gif"
+        packets = self.encode_file("static/" + filename)
+        self.write_keystroke_file(filename, json.loads(packets))
         return ""
         
-    def move_movie(self):
-        #try:
+    def check_existance(self):
+        try:
             path = os.path.expanduser("~/")
             path = os.path.join(path, "Movies/Movie Recording.mov")
-            shutil.move(path, "./movie.mov")
-        #except:
-        #    print "exception", path
-        #    time.sleep(2)
-        #    self.move_movie()
+            return path
+        except:
+            print "exception", path
+            time.sleep(2)
+            self.check_existance()
+
+    def block(self, f):
+        while True:
+            a = subprocess.check_output(['du', '-sk',f])
+            time.sleep(2)
+            b = subprocess.check_output(['du', '-sk',f])
+            if a == b:
+                print a, b, "equal"
+                return
+            else:
+                print a, b, "notequal"
 
     def get_gif(self, args):
         """
@@ -150,7 +168,6 @@ class Server(Resource, threading.Thread):
         for p in packets:
             p["total"] = packetnum
 
-        self.write_keystroke_file(filename, packets)
         return json.dumps(packets)
 
     def write_keystroke_file(self, filename, packets):
