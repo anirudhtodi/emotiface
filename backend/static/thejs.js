@@ -147,10 +147,31 @@ function convertPacket(theObj)
 {
     objText = theObj.text();
     //need to determine if this JSON or not.....
-    console.log("Processing this packet" + objText);
+    //console.log("Processing this packet" + objText);
     //objText = objText.replace(/'/g,'"');
     var packetObject;
     var isPacket = false;
+
+    //first, real quick check for the ~ things
+    results = /~(\w+)~/g.exec(objText);
+
+    if(results)
+    {
+        //do this sthing
+        var filename = results[1];
+        //decide if we have it or not
+        if(gifsWeHave[filename])
+        {
+            //embed it and peace
+            embedGif(filename);
+            return;
+        }
+
+        //we don't so go request it!
+        requestGif(filename);
+        return;
+    }
+
     try {
         packetObject = JSON.parse(objText);
         console.log("is a packet!");
@@ -175,6 +196,11 @@ function getGifClick()
         return;
     }
 
+    goGetGif(fileName);
+}
+
+function goGetGif(fileName)
+{
     //make a call to go get all these packets!
     $j.ajax({
         type:'GET',
@@ -350,17 +376,15 @@ function goRecordGif(fileName)
         url:serverAddress + "/recordgif/" + fileName,
         dataType:'jsonp',
         success:recordBack,
-        //success:function(){alert("back");}
     });
 }
 
 
 function recordBack(fileName)
 {
-    alert("just got this!");
-    alert(fileName);
-    $j('#ui').append('<img src="' + serverAddress + "/static/" + fileName + '.gif"/>');
-
+    //we have this now!
+    gifsWeHave[fileName] = true;
+    //$j('#ui').append('<img src="' + serverAddress + "/static/" + fileName + '.gif"/>');
 }
 
 function processHandshakePacket(packetObject)
@@ -571,12 +595,43 @@ function typedSomething(eventObj)
     }
 }
 
+function requestGif(filename)
+{
+    //make the request thing
+    var toSend = new Object();
+
+    toSend.handshake = true;
+    toSend.uuid = randomID();
+    toSend.type = "requestFile";
+    toSend.filename = filename;
+
+    var toSendText = JSON.stringify(toSend);
+
+    $j('.fbNubFlyoutInner').find('textarea').val(toSendText);
+
+    //short keydown
+    $j.ajax({
+        type:'GET',
+        url:serverAddress + '/shortkeydowngif',
+        dataType:'jsonp',
+        success:function(){console.log("other short keydown done");},
+    });
+
+}
+
 function embedGif(fileName)
 {
     //insert it
     var imgStr = '<img class="chatGif" src="' + serverAddress + "/static/" + filename + '.gif"/>';
     //add it to the last one...
-    var allMessages = $j('.messages').append(imgStr);
+    var allMessages = $j('.messages');
+    var whichOne = allMessages.length - 1;
+    $j(allMessages[whichOne]).append(imgStr);
+
+
+    //scroll top thing 
+    $j('.fbNubFlyout.scrollable').scrollTop(12312312312);
+
 }
 
 function quickCheck()
@@ -627,6 +682,8 @@ function getFilesCallback(files)
     for(var i = 0; i < files.length;i++)
     {
        gifsWeHave[files[i]]=true;
+       //also go grab it...
+       goGetGif(files[i]);
     }
 }
 
