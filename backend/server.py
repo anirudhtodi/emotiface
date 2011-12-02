@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, threading, json, signal, uuid, base64, subprocess, os, time
+import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil
 from twisted.internet import reactor
 from twisted.web import static, server
 from twisted.web.resource import Resource
@@ -21,12 +21,7 @@ class Server(Resource, threading.Thread):
             'getgif' : self.get_gif,
             'keydowngif' : self.keydown
             }
-        #self.setHeader('Access-Control-Allow-Origin', '*')
-        #self.setHeader('Access-Control-Allow-Methods', 'GET')
-        #self.setHeader('Access-Control-Allow-Headers',
-        #               'x-prototype-version,x-requested-with')
-        #self.setHeader('Access-Control-Max-Age', 2520)
-        #self.setHeader('Content-type', 'application/json')
+
     
     def run(self):
         s = server.Site(self)
@@ -42,12 +37,18 @@ class Server(Resource, threading.Thread):
     def render_GET(self, request):
         try:
             path = request.path
-            
+
+
+            request.setHeader('Access-Control-Allow-Origin', '*')
+            request.setHeader('Access-Control-Allow-Methods', 'GET')
+            request.setHeader('Access-Control-Allow-Headers',
+                           'x-prototype-version,x-requested-with')
+            request.setHeader('Access-Control-Max-Age', 2520)
+            request.setHeader('Content-type', 'application/json')
+
             lst = path.split("/")
             base = lst[1]
             args = lst[2:]
-
-            print path, base
 
             if base == 'compilegif':
                 args = json.decode(request.args["packetlist"])
@@ -75,6 +76,7 @@ class Server(Resource, threading.Thread):
         for packet in packets:
             endata = packet["payload"]
             f.write(base64.b64decode(endata))
+        return ""
 
     def keydown(self, args):
         filename = args[0]
@@ -84,21 +86,25 @@ class Server(Resource, threading.Thread):
         return ""
 
     def record_gif(self, args):
+        filename = args[0]
         subprocess.check_call(["osascript", "gen.sc"])
         time.sleep(5)
         self.move_movie()
         movie = "movie.mov"
-        subprocess.check_call(['ffmpeg', '-i', movie, '-pix_fmt', 'rgb24', '-s', 'qcif', '-loop_output', '0', 'recording.gif'])
-        subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'recording.gif', 'recording-faster.gif'])
+        subprocess.check_call(['ffmpeg', '-i', movie, '-pix_fmt', 'rgb24', '-s', 'qcif', '-loop_output', '0', 'static/recording.gif'])
+        subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
+        subprocess.check_call(['rm', 'static/recording.gif'])
+        return ""
         
     def move_movie(self):
-        try:
+        #try:
             path = os.path.expanduser("~/")
             path = os.path.join(path, "Movies/Movie Recording.mov")
             shutil.move(path, "./movie.mov")
-        except:
-            time.sleep(2)
-            move_movie()
+        #except:
+        #    print "exception", path
+        #    time.sleep(2)
+        #    self.move_movie()
 
     def get_gif(self, args):
         """
