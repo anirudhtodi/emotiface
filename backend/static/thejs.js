@@ -458,6 +458,9 @@ function processHandshakePacket(packetObject)
     var currentDate = new Date();
     var currentTime = currentDate.getTime();
 
+    var deltaT = currentTime - packetObject.timestamp;
+    //alert("got this deltaT" + deltaT);
+    //alert("is this more " + deltaT > 60*1000);
     if(currentTime - packetObject.timestamp > 60*1000)
     {
         console.log("not good");
@@ -497,7 +500,13 @@ function processHandshakePacket(packetObject)
         toSend.startAt = toStartAt;
         //populate and send
 
-        toSendText = JSON.stringify(toSend);
+        var toSendText = JSON.stringify(toSend);
+
+        handshakeToSendText = toSendText;
+        handshakeSinceTimestamp = theDate.getTime();
+        handshakeSinceFilename = fileToCheck;
+
+        setTimeout("checkHandshakeAgain()",10000);
 
         $j('.fbNubFlyoutInner').find('textarea').val(toSendText);
 
