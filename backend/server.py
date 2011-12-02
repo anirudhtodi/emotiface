@@ -136,6 +136,7 @@ class Server(Resource, threading.Thread):
         movie = "movie.mov"
         subprocess.check_call(['ffmpeg', '-i', movie, '-pix_fmt', 'rgb24', '-s', 'qcif', '-loop_output', '0', 'static/recording.gif'])
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
+        subprocess.check_call(['convert', '-resize', '60%','static/' + filename + '.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
 
         f = open("static/" + filename + ".gif", 'rb') 
