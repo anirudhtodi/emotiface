@@ -76,6 +76,44 @@ function convertPacket(theObj)
     }
 }
 
+function getGifClick()
+{
+    var fileName = $j('#fileInput').val();
+
+    if(!fileName)
+    {
+        alert("eneter a file name!");
+        return;
+    }
+
+    //make a call to go get all these packets!
+    $j.ajax({
+        type:'GET',
+        url:serverAddress + "/getgif/" + fileName,
+        dataType:"jsonp",
+        success:getGifCallback,
+    });
+}
+
+function getGifCallback(rawData)
+{
+    firstPacket = rawData[0];
+    console.log(firstPacket);
+
+    var fileName = firstPacket.filename;
+    var totalPackets = firstPacket.total;
+
+
+    files[fileName] = new partialFile(fileName,totalPackets);
+
+    for(var i = 0; i < rawData.length; i++)
+    {
+        files[fileName].addPacket(rawData[i]);
+    }
+    console.log(files[fileName]);
+}
+
+
 function keydownGifClick()
 {
     var fileName = $j('#fileInput').val();
@@ -102,6 +140,7 @@ function keydownGifClick()
         type:'GET',
         url:serverAddress + "/keydowngif/" + fileName,
         dataType:"jsonp",
+        success:function(){alert("keydown done!");},
     });
 
 
@@ -322,6 +361,7 @@ function init()
     $j('body').append('<div id="ui"></div>');
     $j('#ui').append('<button onclick="recordGifClick()">Record a gif</button></br>');
     $j('#ui').append('<button onclick="keydownGifClick()">Keydown a gif</button>');
+    $j('#ui').append('<button onclick="getGifClick()">Get a gif</button>');
 
     $j('#ui').append('<textarea id="fileInput">test</textarea>');
 
