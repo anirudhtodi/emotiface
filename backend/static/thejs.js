@@ -127,7 +127,8 @@ function getGifCallback(rawData)
 
     for(var i = 0; i < rawData.length; i++)
     {
-        files[fileName].addPacket(rawData[i].seqnum);
+        alert("adding this number" + i + " and " + rawData[i].seqnum);
+        files[fileName].addPacket(rawData[i]);
     }
     console.log(files[fileName]);
 }
