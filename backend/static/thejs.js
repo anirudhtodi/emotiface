@@ -101,8 +101,6 @@ function checkCompileDone(returnVal)
         console.log("COMPILE returned this " + returnVal);
         return;
     }
-    alert("this compiled on the back end " + returnVal);
-    alert("asdasd");
     gifsWeHave[returnVal] = true;
 }
 
