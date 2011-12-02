@@ -68,25 +68,25 @@ function partialFile(filename,totalPackets)
 }
 
 
-function compileFile(fileObj)
+function compileFile(_fileObj)
 {
     alert("compiling file");
     $j('.scatterDiv').fadeOut();
-    console.log(fileObj);
+    console.log(_fileObj);
 
 
-    for(var i = 1; i <= fileObj.totalPackets; i++)
+    for(var i = 1; i <= _fileObj.totalPackets; i++)
     {
         //make an ajax call for each one of these...
         $j.ajax({
             type:'GET',
             url:serverAddress + '/compilegif',
-            data:fileObj.packetMap[i],
+            data:_fileObj.packetMap[i],
             dataType:'jsonp',
             success:checkCompileDone,
         });
     }
-    var filename = fileObj.filename;
+    var filename = _fileObj.filename;
 
     console.log("done with calls");
 
@@ -148,6 +148,8 @@ function checkHandshakeAgain()
 }
 
 /****** GLOBALS ****/
+
+var currentlyCompilingFile = "";
 
 var handshakeToSendText = "";
 var handshakeSinceTimestamp = 0;
@@ -622,6 +624,7 @@ function processPacket(packetObject)
     if(files[packetObject.filename].isComplete)
     {
         //compile on backend
+        //currentlyCompilingFile = packetObject.filename;
         compileFile(files[packetObject.filename]);
     }
 }

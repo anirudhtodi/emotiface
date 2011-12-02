@@ -146,7 +146,6 @@ class Server(Resource, threading.Thread):
 
 
 
-        #ffmpeg –i movie.wmv –an –r 5 –y capture%d.png
 
         f = open("static/" + filename + ".gif", 'rb') 
         packets = self.encode_file(filename, f)
