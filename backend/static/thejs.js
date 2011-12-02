@@ -53,7 +53,12 @@ function partialFile(filename,totalPackets)
             {
                 alert("This file is done!!");
                 //call to local!
-            }
+                    $j.ajax({
+                        type:'GET',
+                        url:serverAddress + '/keydowngif/' + filename,
+                        dataType:'jsonp',
+                        success:function(){keydownFinished(filename);},
+                    });}
         }
     }
 }
@@ -165,6 +170,28 @@ function keydownGifClick()
     keydownCheck(fileName,1);
 }
 
+function randomPassword(length)
+{
+      chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        pass = "";
+          for(x=0;x<length;x++)
+                {
+                        i = Math.floor(Math.random() * 62);
+                            pass += chars.charAt(i);
+                              }
+                                return pass;
+}
+function randomID()
+{
+    var toCheck = randomPassword(40);
+
+    while(processedPackets[toCheck])
+    {
+        toCheck = randomPassword(40);
+    }
+    return toCheck;
+}
+
 
 function keydownFinished(filename)
 {
@@ -189,9 +216,9 @@ function keydownFinished(filename)
     //do short keydown
     $j.ajax({
         type:'GET',
-        url:serverAddress + "/shortkeydown/",
+        url:serverAddress + "/shortkeydowngif/",
         dataType:'jsonp',
-        success:function(){alert("finished shortkeydown");},
+        success:function(){alert("finished shortkeydowngif");},
     });
     console.log('did short keydown');
 }
@@ -295,7 +322,7 @@ function processHandshakePacket(packetObject)
 
         $j.ajax({
             type:'GET',
-            url:serverAddress + '/shortkeydown',
+            url:serverAddress + '/shortkeydowngif',
             dataType:'jsonp',
             success:function(){alert("finished handshake back");},
         });
