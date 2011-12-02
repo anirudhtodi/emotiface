@@ -91,17 +91,12 @@ function keydownGifClick()
 
 function recordGifClick()
 {
-    //see how many seconds
-    alert($j('#numseconds').val());
-    var seconds = Number($j('#numseconds').val());
-    if(!seconds || seconds <= 0 || seconds > 20)
-    {
-        alert("wrong seconds!");
-    }
+    //filename
+    var fileName = $j('#fileInput').val();
 
     //make the call to local
     $j.ajax({
-    url:serverAddress + "/recordgif/" + String(seconds) + "/test.gif",
+    url:serverAddress + "/recordgif/" + fileName,
     dataType:"jsonp",
     });
 }
@@ -237,7 +232,6 @@ function init()
     $j('body').append('<div id="incoming" class="packetDebug"></div>');
     $j('body').append('<div id="ui"></div>');
     $j('#ui').append('<button onclick="recordGifClick()">Record a gif</button></br>');
-    $j('#ui').append('<textarea id="numseconds">3</textarea><p></p><p></p>');
     $j('#ui').append('<button onclick="keydownGifClick()">Keydown a gif</button>');
 
     $j('#ui').append('<textarea id="fileInput">test.gif</textarea>');
