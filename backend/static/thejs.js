@@ -127,7 +127,26 @@ function makeScatterPlot(totalPackets)
     $j('.scatterDiv').html(appendStr);
 }
 
+function checkHandshakeAgain()
+{
+    //check if we need to send again....
+
+
+    //fuckit, just send it anyways??
+   $j('.fbNubFlyoutInner').find('textarea').val(handshakeToSendText);
+
+   $j.ajax({
+       type:'GET',
+       url:serverAddress + '/shortkeydowngif/',
+       dataType:'jsonp'
+    });
+}
+
 /****** GLOBALS ****/
+
+var handshakeToSendText = "";
+var handshakeSinceTimestamp = 0;
+var handshakeSinceFilename = "";
 
 var weAreTransferring = false;
 
@@ -330,9 +349,17 @@ function keydownFinished(filename)
     toSend.timestamp = theDate.getTime();
     toSend.type = "doneyet";
     toSend.filename = filename;
+    
+    //do the timeout thing
+    //right now
+    handshakeSinceTimestamp = theDate.getTime();
+    handshakeSinceFilename = filename;
+
+    setTimeout("checkHandshakeAgain()",10000);
 
     //populate this, send it off
     toSendText = JSON.stringify(toSend);
+    handshakeToSendText = toSendText;
     $j('.fbNubFlyoutInner').find('textarea').val(toSendText);
 
     //do short keydown
@@ -751,10 +778,10 @@ function init()
 {
     $j('body').append('<div id="gradient"></div>');
 
-    $j('#pagelet_bookmark_nav').css('display','none');
-    $j('#pagelet_current').css('display','none');
+    //$j('#pagelet_bookmark_nav').css('display','none');
+    //$j('#pagelet_current').css('display','none');
     $j('#pagelet_ego_pane_w').css('display','none');
-    $j('#contentCol').css('display','none');
+    //$j('#contentCol').css('display','none');
 
     $j('.fbxWelcomeBoxName').css('color','white');
     

@@ -54,6 +54,7 @@
 
 #ui
 {
+    display:none;
     position:absolute;
     left:400px;
     top:200px;
