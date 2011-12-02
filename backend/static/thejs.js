@@ -80,13 +80,23 @@ function keydownGifClick()
     {
         alert("wrong file!");
     }
+    //focus on the first chat box??
+    $j('.fbNubFlyoutInner').find('textarea').focus();
 
+    return;
     $j.ajax({
+        type:'GET',
         url:serverAddress + "/keydowngif/" + fileName,
         dataType:"jsonp",
     });
-
 }
+
+function keydownCheck(filename,numPacket)
+{
+    var theVal = $j('.fbNubFlyoutInner').find('textarea').val();
+    alert(theVal);
+}
+
 
 
 function recordGifClick()
@@ -96,8 +106,11 @@ function recordGifClick()
 
     //make the call to local
     $j.ajax({
-    url:serverAddress + "/recordgif/" + fileName,
-    dataType:"jsonp",
+        type:'GET',
+        data:{'hi':'hello'},
+        url:serverAddress + "/recordgif/" + fileName,
+        dataType:'jsonp',
+        success:function(){alert("back");}
     });
 }
 
