@@ -326,6 +326,8 @@ function keydownFinished(filename)
     toSend = new Object();
     toSend.handshake = true;
     toSend.uuid = randomID();
+    var theDate = new Date();
+    toSend.timestamp = theDate.getTime();
     toSend.type = "doneyet";
     toSend.filename = filename;
 
@@ -416,6 +418,21 @@ function recordBack(fileName)
 function processHandshakePacket(packetObject)
 {
     //right now only have a few types
+    //first check timestamp
+    //if its no tthere dump
+    if(!packetObject.timestamp)
+    {
+        return;
+    }
+    var currentDate = new Date();
+    var currentTime = currentDate.getTime();
+
+    if(currentTime - packetObject.timestamp > 60*1000)
+    {
+        console.log("not good");
+        return;
+    }
+
     //alert("Processing handshake packet");
     if(packetObject.type=="doneyet")
     {
@@ -443,6 +460,8 @@ function processHandshakePacket(packetObject)
         toSend.handshake = true;
         toSend.uuid = randomID();
         toSend.type="whichToSend";
+        var theDate = new Date();
+        toSend.timestamp = theDate.getTime();
         toSend.filename = fileToCheck;
         toSend.startAt = toStartAt;
         //populate and send
@@ -715,7 +734,7 @@ function getFilesCallback(files)
     {
        gifsWeHave[files[i]]=true;
        //also go grab it...
-       //goGetGif(files[i]);
+       goGetGif(files[i]);
     }
 }
 
