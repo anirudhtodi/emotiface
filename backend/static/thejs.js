@@ -622,7 +622,7 @@ function requestGif(filename)
 function embedGif(fileName)
 {
     //insert it
-    var imgStr = '<img class="chatGif" src="' + serverAddress + "/static/" + filename + '.gif"/>';
+    var imgStr = '<img class="chatGif" src="' + serverAddress + "/static/" + fileName + '.gif"/>';
     //add it to the last one...
     var allMessages = $j('.messages');
     var whichOne = allMessages.length - 1;
