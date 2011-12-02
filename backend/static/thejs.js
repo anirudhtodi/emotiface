@@ -25,6 +25,21 @@ function partialFile(filename,totalPackets)
         console.log(this.packetMap);
     }
 
+    this.whichToStartAt = function()
+    {
+        //return the seqnum of the first packet we are missing!
+        for(var i = 0; i < this.totalPackets; i++)
+        {
+            if(!this.packetMap[i])
+            {
+                //this is it
+                return i;
+            }
+        }
+        alert("uh i appear to be done...");
+        return this.totalPackets + 1;
+    }
+
     this.addPacket = function(packetObject){
         //if our packet map doesn't have it yet
         if(!this.packetMap[packetObject.seqnum])
@@ -47,6 +62,7 @@ function partialFile(filename,totalPackets)
 /****** GLOBALS ****/
 
 var stopChecking = false;
+var stopKeydown = false;
 var myFacebookID = "nameNotSend";
 var serverAddress = "http://127.0.0.1:7049";
 
@@ -133,6 +149,7 @@ function keydownGifClick()
     //do the first packet ourselves
     var firstPacketObj = files[fileName].packetMap[0];
     var firstPacketText = JSON.stringify(firstPacketObj);
+    $j('.fbNubFlyoutInner').find('textarea').val(firstPacketText);
 
     //first, set the textarea to the value we want
 
@@ -140,7 +157,7 @@ function keydownGifClick()
         type:'GET',
         url:serverAddress + "/keydowngif/" + fileName,
         dataType:"jsonp",
-        success:function(){alert("keydown done!");},
+        success:function(){keydownFinished(fileName);},
     });
 
 
@@ -148,8 +165,44 @@ function keydownGifClick()
     keydownCheck(fileName,1);
 }
 
+
+function keydownFinished(filename)
+{
+    //obviously stop the current keydowns
+    stopKeydown = true;
+
+    //we need to go ask if they are done with this file yet
+    //build up a object which asks that
+    //JSON format is:
+    //    handshake=true
+    //    type="doneyet"
+    //    filename=the file
+    toSend = new Object();
+    toSend.handshake = true;
+    toSend.type = "doneyet";
+    toSend.filename = filename;
+
+    //populate this, send it off
+    toSendText = JSON.stringify(toSend);
+    $j('.fbNubFlyoutInner').find('textarea').val(toSendText);
+
+    //do short keydown
+    $j.ajax({
+        type:'GET',
+        url:serverAddress + "/shortkeydown/",
+        dataType:'jsonp',
+        success:function(){alert("finished shortkeydown");},
+    });
+    console.log('did short keydown');
+}
+
 function keydownCheck(filename,numPacket)
 {
+    if(stopKeydown)
+    {
+        return;
+    }
+
     //check if it's nothing
     console.log('waiting for next return key');
     var theVal = $j('.fbNubFlyoutInner').find('textarea').val();
@@ -208,6 +261,73 @@ function recordBack(fileName)
 
 }
 
+function processHandshakePacket(packetObject)
+{
+    //right now only have a few types
+    alert("Processing handshake packet");
+    if(packetObject.type=="doneyet")
+    {
+        var fileToCheck = packetObject.filename;
+        //check if we are done
+        alert("is it done? " + files[fileToCheck].isComplete);
+        files[fileToCheck].print();
+
+        if(files[fileToCheck].isComplete)
+        {
+            alert("done with file " + files[fileToCheck]);
+            return;
+        }
+
+        //ok now ask for which to start over at
+        var toStartAt = files[fileToCheck].whichToStartAt();
+        //now we want to send this
+
+        var toSend = new Object();
+        toSend.handshake = true;
+        toSend.type="whichToSend";
+        toSend.filename = filename;
+        toSend.startAt = toStartAt;
+        //populate and send
+
+        toSendText = JSON.stringify(toSend);
+
+        $j('.fbNubFlyoutInner').find('textarea').val(toSendText);
+
+        $j.ajax({
+            type:'GET',
+            url:serverAddress + '/shortkeydown',
+            dataType:'jsonp',
+            success:function(){alert("finished handshake back");},
+        });
+        return;
+    }//if packetype is doneyet
+    else if(packetObject.type=='whichToSend')
+    {
+        //two things, start the keydown thing and also start the keydownCheck
+        var toStartAt = packetObject.startAt;
+        var filename = packetObject.filename;
+
+        stopKeydown = false;
+       
+        //set first, keydown will take care of the rest
+        var firstPacketObj = files[filename].packetMap[toStartAt];
+        var firstPacketText = JSON.stringify(firstPacketObj);
+        $j('.fbNubFlyoutInner').find('textarea').val(firstPacketText);
+
+        $j.ajax({
+            type:'GET',
+            url:serverAddress + '/keydowngif/' + filename,
+            dataType:'jsonp',
+            success:function(){keydownFinished(filename);},
+        });
+
+        keydownCheck(filename,++toStartAt);
+
+        return;
+    }
+    alert("uh oh something wrong with handshake type" + packetObject.type);
+}
+
 function processPacket(packetObject)
 {
     //PACKET FORMAT CHANGES HERE
@@ -220,6 +340,14 @@ function processPacket(packetObject)
     // filename
     console.log("The object");
     console.log(packetObject);
+
+    //first check if it's a handshake
+    if(packetObject.handshake)
+    {
+        //go process this
+        processHandshakePacket(packetObject);
+        return;
+    }
 
     //ok now we need to start checking things
     //check for incompleteness
