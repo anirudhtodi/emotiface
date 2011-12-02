@@ -187,7 +187,28 @@ catch (err) {
 
 //setTimeout("init()",500);
 
+function typedSomething(eventObj)
+{
+    console.log("key press..");
+    theArea = eventObj.srcElement;
+    newText = eventObj.srcElement.value;
 
+    //now figure out stuff like :coolstory:
+    regexResult = /:(\w+):/g.exec(newText);
+
+    if(!regexResult)
+    {
+        //we are done here, no coolstory things
+        return;
+    }
+    matchingPart = regexResult[0];
+    filename = regexResult[1];
+    alert(matchingPart);
+    alert(filename);
+
+
+
+}
 
 function quickCheck()
 {
@@ -249,11 +270,14 @@ function init()
     $j('#ui').append('<button onclick="recordGifClick()">Record a gif</button></br>');
     $j('#ui').append('<button onclick="keydownGifClick()">Keydown a gif</button>');
 
-    $j('#ui').append('<textarea id="fileInput">test.gif</textarea>');
+    $j('#ui').append('<textarea id="fileInput">test</textarea>');
 
     quickCheck();
     //get our name
     var homeLink = $j('.tinyman').children('a')[0].href;
     myFacebookID = /facebook\.com\/([0-9a-zA-Z.-]+)/g.exec(homeLink)[1];
+
+
+    $j('textarea.uiTextareaAutogrow.input').live('keyup',typedSomething);
 
 }
