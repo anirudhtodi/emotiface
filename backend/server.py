@@ -83,18 +83,19 @@ class Server(Resource, threading.Thread):
         total = packet["total"][0]
         payload = packet["payload"][0]
         filename = packet["filename"][0]
-        
-        print "Compiling:", seqnum, total
 
-        if uid not in self.packet_map.keys():
+        if uid not in self.packet_map.keys() and total != seqnum:
+            print "FOOOOOOO", self.packet_map.keys(), uid
             self.packet_map[uid] = [filename, total, {seqnum : payload}]
         else:
             self.packet_map[uid][2][seqnum] = payload
+
+        print "Compiling:", seqnum, total, len(self.packet_map[uid][2]), uid
         
         if len(self.packet_map[uid][2]) == int(total):
             print "Finished downloading", filename
             self.write_out_file(uid)
-            return filename
+            return '"' + filename + '"'
         else:
             return "false"
 
