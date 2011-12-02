@@ -60,7 +60,7 @@ class Server(Resource, threading.Thread):
             elif base == "static":
                 if path.endswith(".css"):
                     request.setHeader('content-type', 'text/css')
-                f = open(path[1:            print path, request.args], 'r')
+                f = open(path[1:], 'r')
                 return f.read()
             elif base in self.functions:
                 return self.wrap(self.functions[base](args))
