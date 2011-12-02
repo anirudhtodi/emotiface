@@ -99,26 +99,25 @@ class Server(Resource, threading.Thread):
         filename, total, packets = self.packet_map[uid]
         total = int(total)
 
+        print "--------- COMPILING:", packets.keys()
         
         filepath = "static/" + filename + ".gif"
         f = open(filepath, 'wb')
         i = 1
         while i <= total:
-            print "trying to add this packet"
-            print packets[str(i)]
-            print len(packets[str(i)])
+            #print "trying to add this packet"
+            #print packets[str(i)]
+            #print len(packets[str(i)])
             endata = packets[str(i)]
-
-            if len(endata) % 4 != 0:
-                print "INCORRECT PACKET LENGTH: ", len(endata)
-
-            f.write(base64.urlsafe_b64decode(endata))
+            decoded =  base64.urlsafe_b64decode(endata)
+            print "SIZE DIFFERENCE:", len(decoded) - len(endata)
+            f.write(decoded)
 
             #f.write(binascii.a2b_base64(endata))
             i += 1
-        print "OK I just finished encoding that thing"
-        print "total was " + str(total)
-        print len(packets.keys()), " was keys"
+        #print "OK I just finished encoding that thing"
+        #print "total was " + str(total)
+        #print len(packets.keys()), " was keys"
 
         del self.packet_map[uid]
         return "whatt"
