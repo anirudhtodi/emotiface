@@ -249,7 +249,7 @@ function keydownCheck(filename,numPacket)
     var totalPackets = files[filename].totalPackets;
     //we are sending this packet next
     numPacket++;
-    if(numPacket == totalPackets)
+    if(numPacket > totalPackets)
     {
         //we are done!
         return;
