@@ -340,7 +340,7 @@ function keydownFinished(filename)
         type:'GET',
         url:serverAddress + "/shortkeydowngif/",
         dataType:'jsonp',
-        success:function(){alert("finished shortkeydowngif");},
+        success:function(){console.log("finished shortkeydowngif");},
     });
     console.log('did short keydown');
 }
@@ -444,7 +444,7 @@ function processHandshakePacket(packetObject)
             return;
         }
         //alert("is it done? " + files[fileToCheck].isComplete);
-        files[fileToCheck].print();
+        //files[fileToCheck].print();
 
         if(files[fileToCheck].isComplete)
         {
@@ -512,7 +512,7 @@ function processHandshakePacket(packetObject)
     else if (packetObject.type=='requestFile')
     {
         var filename = packetObject.filename;
-        alert("this was requested" + filename);
+        //alert("this was requested" + filename);
         goKeydownGif(filename);
     }
     alert("uh oh something wrong with handshake type" + packetObject.type);
