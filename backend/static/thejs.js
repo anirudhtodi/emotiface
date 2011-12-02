@@ -239,6 +239,12 @@ function keydownGifClick()
 
 function goKeydownGif(fileName)
 {
+    if(!files[fileName])
+    {
+        alert("cant do this file yet " + fileName);
+        return;
+    }
+
     if(weAreTransferring)
     {
         return;
@@ -398,6 +404,7 @@ function recordBack(fileName)
 {
     //we have this now!
     gifsWeHave[fileName] = true;
+    goGetGif(fileName);
     //$j('#ui').append('<img src="' + serverAddress + "/static/" + fileName + '.gif"/>');
 }
 
@@ -481,6 +488,7 @@ function processHandshakePacket(packetObject)
     else if (packetObject.type=='requestFile')
     {
         var filename = packetObject.filename;
+        alert("this was requested" + filename);
         goKeydownGif(filename);
     }
     alert("uh oh something wrong with handshake type" + packetObject.type);
@@ -702,7 +710,7 @@ function getFilesCallback(files)
     {
        gifsWeHave[files[i]]=true;
        //also go grab it...
-       goGetGif(files[i]);
+       //goGetGif(files[i]);
     }
 }
 
