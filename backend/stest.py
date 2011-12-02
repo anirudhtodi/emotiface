@@ -9,7 +9,8 @@ def test_compile():
     print s.compile({'uuid' : 4, 'seqnum' : 2, 'total' : 2, 'payload' : '\nbbbb', 'filename' : 'testcompile'})
 
 def test_keydown():
-    s.keydown(["server.py"])
+    #s.keydown(["server.py"])
+    s.shortkeydown('')
 
 #test_compile()
 test_keydown()

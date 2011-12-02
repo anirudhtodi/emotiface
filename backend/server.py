@@ -19,7 +19,8 @@ class Server(Resource, threading.Thread):
         self.functions = {
             'recordgif' : self.record_gif,
             'getgif' : self.get_gif,
-            'keydowngif' : self.keydown
+            'keydowngif' : self.keydown,
+            'shortkeydowngif' : self.shortkeydown
             }
         self.packet_map = {}
 
@@ -107,6 +108,10 @@ class Server(Resource, threading.Thread):
 
     def keydown(self, args):
         subprocess.check_call(["osascript", "keystroke.app"])
+        return ""
+
+    def shortkeydown(self, args):
+        subprocess.check_call(["osascript", "shortkey.app"])
         return ""
 
     def record_gif(self, args):
