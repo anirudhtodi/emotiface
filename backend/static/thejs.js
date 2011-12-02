@@ -468,12 +468,12 @@ function typedSomething(eventObj)
         return;
     }
     matchingPart = regexResult[0];
+    //the thing
     filename = regexResult[1];
 
-    alert(matchingPart);
-    alert(filename);
-
-
+    //insert it
+    var imgStr = '<img src="' + serverAddress + "/static/" + filename + '.gif"/>';
+    $j('.messages').append(imgStr);
 
 }
 
