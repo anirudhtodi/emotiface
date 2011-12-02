@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil, glob
+import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil, glob, re
 from twisted.internet import reactor
 from twisted.web import static, server
 from twisted.web.resource import Resource
@@ -12,7 +12,7 @@ class Server(Resource, threading.Thread):
     """
     
     """
-    max_payload_size = 448
+    max_payload_size = 848
     
     def __init__(self):
         threading.Thread.__init__(self)
@@ -22,7 +22,8 @@ class Server(Resource, threading.Thread):
             'getgif' : self.get_gif,
             'keydowngif' : self.keydown,
             'shortkeydowngif' : self.shortkeydown,
-            'filenames' : self.filenames
+            'filenames' : self.filenames,
+            'filetransfer' : self.file_transfer
             }
         self.packet_map = {}
 
@@ -97,26 +98,24 @@ class Server(Resource, threading.Thread):
     def write_out_file(self, uid):
         filename, total, packets = self.packet_map[uid]
         total = int(total)
-        
-        filepath = "static/" + filename + ".gif"
+
+        pattern = re.compile(r'[^. ]+\.\w+')
+        match = pattern.search(filename)
+        if match:
+            path = os.path.expanduser("~/")
+            path = os.path.join(path, "Desktop/" + filename)
+            filepath = path
+        else:
+            filepath = "static/" + filename + ".gif"
+
         f = open(filepath, 'wb')
         i = 1
         while i <= total:
-            #print "trying to add this packet"
-            #print packets[str(i)]
-            #print len(packets[str(i)])
             endata = packets[str(i)]
             decoded =  base64.urlsafe_b64decode(endata)
             f.write(decoded)
-
-            #f.write(binascii.a2b_base64(endata))
             i += 1
-        #print "OK I just finished encoding that thing"
-        #print "total was " + str(total)
-        #print len(packets.keys()), " was keys"
-
         del self.packet_map[uid]
-        return "whatt"
 
     def keydown(self, args):
         subprocess.check_call(["osascript", "keystroke.app"])
@@ -139,7 +138,8 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
 
-        packets = self.encode_file(filename)
+        f = open("static/" + filename + ".gif", 'rb') 
+        packets = self.encode_file(filename, f)
         return '"'+filename+'"'
         
     def check_existance(self):
@@ -172,13 +172,13 @@ class Server(Resource, threading.Thread):
         where packet_number starts at 0 and ends at total_packets.
         """
         filename = args[0]
-        return self.encode_file(filename)
+        f = open("static/" + filename + ".gif", 'rb') 
+        return self.encode_file(filename, f)
 
-    def encode_file(self, filename):
+    def encode_file(self, filename, f):
         """
         Encodes the given file into a JSON encoded set of "packets."
         """
-        f = open("static/" + filename + ".gif", 'rb')
         
         packets = []
         packetnum = 0
@@ -193,6 +193,7 @@ class Server(Resource, threading.Thread):
             p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : encoded, "filename" : filename}
             packets.append(p)
 
+        f.close()
         for p in packets:
             p["total"] = packetnum
 
@@ -202,6 +203,14 @@ class Server(Resource, threading.Thread):
         files = glob.glob('static/*')
         files = [f[7:-4] for f in files if f.endswith(".gif")]
         return json.dumps(files)
+
+    def file_transfer(self, args):
+        filename = args[0]
+        path = os.path.expanduser("~/")
+        path = os.path.join(path, "Desktop/" + filename)
+        f = open(path, 'rb')
+        return self.encode_file(filename, f)
+        
 
 if __name__ == "__main__":
     s = Server()
