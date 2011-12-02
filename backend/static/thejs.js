@@ -166,6 +166,11 @@ function convertPacket(theObj)
         {
             //embed it and peace
             embedGif(filename);
+            //make sure it's loaded too!
+            if(!files[filename])
+            {
+                goGetGif(filename); 
+            }
             return;
         }
 
