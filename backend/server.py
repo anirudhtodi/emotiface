@@ -161,9 +161,9 @@ class Server(Resource, threading.Thread):
     def encode_file(self, filename):
         """
         Encodes the given file into a JSON encoded set of "packets."
-
         """
-        f = open(filename, 'rb')
+
+        f = open("static/" + filename + ".gif", 'rb')
         
         packets = []
         packetnum = 0
@@ -192,32 +192,7 @@ class Server(Resource, threading.Thread):
             p["total"] = packetnum
 
         return json.dumps(packets)
-
-    # def write_keystroke_file(self, filename, packets):
-    #     output_text = 'tell application "System Events"\n'
-    #     packets = [json.dumps(p) for p in packets]
-    #     output_text2 = ""
-    #     new_file_name = "QQQ_" + filename
-    #     f = open("static/" + new_file_name, 'w')
-    #     for packet in packets:
-    #         p = packet.replace('\"', "'")
-    #         output_text2 += 'keystroke "%s" \nkey down return \n' % p
-    #     output_text2 += 'end tell\n'
-    #     f.write(output_text + output_text2)        
-
-    def write_keystroke_file(self, filename, packets):
-        output_text = 'tell application "System Events"\n'
-        # packets = [json.dumps(p) for p in packets]
-        output_text2 = ""
-        new_file_name = "QQQ_" + filename
-        f = open("static/" + new_file_name, 'w')
-        for i in range(10):
-            output_text2 += 'key down return \n delay 1\n'
-        # for packet in packets:
-        #     p = packet.replace('\"', "'")
-        #     output_text2 += 'keystroke "%s" \nkey down return \n' % p
-        output_text2 += 'end tell\n'
-        f.write(output_text + output_text2)        
+     
 
 if __name__ == "__main__":
     s = Server()
