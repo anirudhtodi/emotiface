@@ -5,6 +5,7 @@
 
 //use the filename as a string to access these objects
 files = new Object();
+gifsWeHave = new Object();
 processedPackets = new Object();
 
 function partialFile(filename,totalPackets)
@@ -61,12 +62,6 @@ function partialFile(filename,totalPackets)
             {
                 this.isComplete = true;
                 //call to local!
-
-                //go call to compile
-                if(confirm("Compile this on backend?"))
-                {
-                    compileFile(this);
-                }
             }
         }
     }
@@ -102,6 +97,8 @@ function checkCompileDone(returnVal)
         return;
     }
     alert("this compiled on the back end " + returnVal);
+    alert("asdasd");
+    gifsWeHave[returnVal] = true;
 }
 
 
@@ -340,6 +337,12 @@ function recordGifClick()
     //filename
     var fileName = $j('#fileInput').val();
 
+    goRecordGif(fileName);
+}
+
+function goRecordGif(fileName)
+{
+
     //make the call to local
     $j.ajax({
         type:'GET',
@@ -417,7 +420,7 @@ function processHandshakePacket(packetObject)
         //check if we have started this...?
         if(!files[filename])
         {
-            alert("cant resent this file " + filename + " cause havent started");
+            //alert("cant resent this file " + filename + " cause havent started");
             return;
         }
        
@@ -498,8 +501,13 @@ function processPacket(packetObject)
 
     //now we are sure it's made, so go add this packet
     files[packetObject.filename].addPacket(packetObject);
-    //print the file
-    //files[packetObject.filename].print();
+
+    //if it's done now
+    if(files[packetObject.filename].isComplete)
+    {
+        //compile on backend
+        compileFile(files[packetObject.filename]);
+    }
 }
 
 
@@ -529,12 +537,12 @@ catch (err) {
 
 function typedSomething(eventObj)
 {
-    console.log("key press..");
+    //console.log("key press..");
     theArea = eventObj.srcElement;
     newText = eventObj.srcElement.value;
 
     //now figure out stuff like :coolstory:
-    regexResult = /:(\w+):/g.exec(newText);
+    regexResult = /:([0-9a-zA-Z-.]+):/g.exec(newText);
 
     if(!regexResult)
     {
@@ -544,11 +552,31 @@ function typedSomething(eventObj)
     matchingPart = regexResult[0];
     //the thing
     filename = regexResult[1];
+    replacedText = newText.replace(matchingPart,'~'+filename+'~');
+    eventObj.srcElement.value = replacedText;
 
+    //if we straight up have it, just display it, easy
+    if(gifsWeHave[filename])
+    {
+        embedGif(filename);
+        return;
+    }
+    //now we have to record
+    if(confirm("You don't have the gif '" + filename + "'. Would you like to record it?"))
+    {
+        goRecordGif(filename);
+        //also delete it now
+        newText = newText.replace(matchingPart,'');
+        eventObj.srcElement.value = newText;
+    }
+}
+
+function embedGif(fileName)
+{
     //insert it
-    var imgStr = '<img src="' + serverAddress + "/static/" + filename + '.gif"/>';
-    $j('.messages').append(imgStr);
-
+    var imgStr = '<img class="chatGif" src="' + serverAddress + "/static/" + filename + '.gif"/>';
+    //add it to the last one...
+    var allMessages = $j('.messages').append(imgStr);
 }
 
 function quickCheck()
@@ -558,7 +586,7 @@ function quickCheck()
         return;
     }
 
-    console.log("Checking...");
+    //console.log("Checking...");
     all = $j('.fbChatMessage').not('.read');
     if(all.length > 0)
     {
@@ -592,13 +620,14 @@ function quickCheck()
 }
 
 
-var autoCompleteFiles = new Object();
-function getFilesCallback(files) {
-    //var files = JSON.parse(rawData);
-    autoCompleteFiles = files;
-    $j('textarea.uiTextareaAutogrow.input').autocomplete({
-      source: files
-    });
+function getFilesCallback(files)
+{
+    console.log("these are available...");
+    console.log(files);
+    for(var i = 0; i < files.length;i++)
+    {
+       gifsWeHave[files[i]]=true;
+    }
 }
 
 function onMouseDown()

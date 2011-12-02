@@ -9,6 +9,11 @@
     overflow:hidden;
 }
 
+.chatGif {
+    width:150px;
+    margin:0px;
+}
+
 .littlePacket {
     margin:0px;
     border:0px;
