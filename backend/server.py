@@ -99,7 +99,7 @@ class Server(Resource, threading.Thread):
 
         packets = self.encode_file("static/" + filename + ".gif")
         self.write_keystroke_file(filename, json.loads(packets))
-        return filename
+        return '"'+filename+'"'
         
     def check_existance(self):
         try:
