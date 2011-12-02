@@ -87,9 +87,14 @@ class Server(Resource, threading.Thread):
         else:
             self.packet_map[uid][2][seqnum] = payload
         
-        print self.packet_map[uid][2], total
+        print "ok so below is the length and the total"
+        print len(self.packet_map[uid][2]), " asd ", total
+        print filename
+        print type(total)
+        print "checking the if"
 
-        if len(self.packet_map[uid][2]) == total:
+        if len(self.packet_map[uid][2]) == int(total):
+            print " inside loop!!"
             self.write_out_file(uid)
             return filename
         else:
@@ -97,6 +102,7 @@ class Server(Resource, threading.Thread):
 
     def write_out_file(self, uid):
         filename, total, packets = self.packet_map[uid]
+        total = int(total)
         
         filepath = "static/" + filename + ".gif"
         f = open(filepath, 'wb')
@@ -106,6 +112,7 @@ class Server(Resource, threading.Thread):
             f.write(base64.b64decode(endata))
             i += 1
         del self.packet_map[uid]
+        return "whatt"
 
     def keydown(self, args):
         subprocess.check_call(["osascript", "keystroke.app"])
