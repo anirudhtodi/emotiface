@@ -129,6 +129,8 @@ function makeScatterPlot(totalPackets)
 
 /****** GLOBALS ****/
 
+var weAreTransferring = false;
+
 var progressScatterFilename= "";
 var stopChecking = false;
 var stopKeydown = false;
@@ -164,6 +166,11 @@ function convertPacket(theObj)
         {
             //embed it and peace
             embedGif(filename);
+            //make sure it's loaded too!
+            if(!files[filename])
+            {
+                goGetGif(filename); 
+            }
             return;
         }
 
@@ -232,6 +239,23 @@ function getGifCallback(rawData)
 function keydownGifClick()
 {
     var fileName = $j('#fileInput').val();
+    goKeydownGif(fileName);
+}
+
+function goKeydownGif(fileName)
+{
+    if(!files[fileName])
+    {
+        alert("cant do this file yet " + fileName);
+        return;
+    }
+
+    if(weAreTransferring)
+    {
+        return;
+    }
+    weAreTransferring = true;
+
     if(!$j('#fileInput').val())
     {
         alert("no file!");
@@ -291,6 +315,7 @@ function keydownFinished(filename)
 {
     //obviously stop the current keydowns
     stopKeydown = true;
+    weAreTransferring = false;
 
     //we need to go ask if they are done with this file yet
     //build up a object which asks that
@@ -384,6 +409,7 @@ function recordBack(fileName)
 {
     //we have this now!
     gifsWeHave[fileName] = true;
+    goGetGif(fileName);
     //$j('#ui').append('<img src="' + serverAddress + "/static/" + fileName + '.gif"/>');
 }
 
@@ -463,6 +489,12 @@ function processHandshakePacket(packetObject)
         keydownCheck(filename,++toStartAt);
 
         return;
+    }
+    else if (packetObject.type=='requestFile')
+    {
+        var filename = packetObject.filename;
+        alert("this was requested" + filename);
+        goKeydownGif(filename);
     }
     alert("uh oh something wrong with handshake type" + packetObject.type);
 }
@@ -683,7 +715,7 @@ function getFilesCallback(files)
     {
        gifsWeHave[files[i]]=true;
        //also go grab it...
-       goGetGif(files[i]);
+       //goGetGif(files[i]);
     }
 }
 
