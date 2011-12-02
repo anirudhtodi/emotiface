@@ -28,7 +28,7 @@ function partialFile(filename,totalPackets)
     this.whichToStartAt = function()
     {
         //return the seqnum of the first packet we are missing!
-        for(var i = 0; i < this.totalPackets; i++)
+        for(var i = 1; i < this.totalPackets; i++)
         {
             if(!this.packetMap[i])
             {
@@ -127,7 +127,7 @@ function getGifCallback(rawData)
 
     for(var i = 0; i < rawData.length; i++)
     {
-        files[fileName].addPacket(rawData[i]);
+        files[fileName].addPacket(rawData[i].seqnum);
     }
     console.log(files[fileName]);
 }
