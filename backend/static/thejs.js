@@ -71,6 +71,7 @@ function partialFile(filename,totalPackets)
 function compileFile(fileObj)
 {
     alert("compiling file");
+    $j('.scatterDiv').fadeOut();
     console.log(fileObj);
 
 
