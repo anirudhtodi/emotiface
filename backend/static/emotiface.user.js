@@ -35,8 +35,8 @@ _ui_style.href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jq
 document.getElementsByTagName('head')[0].appendChild(_my_script1);
 document.getElementsByTagName('head')[0].appendChild(_my_script3);
 document.getElementsByTagName('head')[0].appendChild(_my_style);
-document.getElementsByTagName('head')[0].appendChild(_ui_style);
-document.getElementsByTagName('head')[0].appendChild(_ui_js);
+//document.getElementsByTagName('head')[0].appendChild(_ui_style);
+//document.getElementsByTagName('head')[0].appendChild(_ui_js);
 console.log('done with both');
 
 

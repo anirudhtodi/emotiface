@@ -562,5 +562,5 @@ function init()
     });
 
     $j('textarea.uiTextareaAutogrow.input').live('keyup',typedSomething);
-	$j('body').mousedown(onMouseDown);
+	//$j('body').mousedown(onMouseDown);
 }
