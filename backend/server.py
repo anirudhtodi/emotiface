@@ -87,8 +87,7 @@ class Server(Resource, threading.Thread):
 
     def keydown(self, args):
         filename = args[0]
-        filepath = "static/QQQ_" + filename
-        print filepath
+        filepath = "static/QQQ_" + filename + ".gif"
         subprocess.check_call(["osascript", filepath])
         return ""
 
@@ -106,6 +105,7 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['rm', 'static/recording.gif'])
 
         filename = filename + ".gif"
+
         packets = self.encode_file("static/" + filename)
         self.write_keystroke_file(filename, json.loads(packets))
         return ""
@@ -196,7 +196,7 @@ class Server(Resource, threading.Thread):
         new_file_name = "QQQ_" + filename
         f = open("static/" + new_file_name, 'w')
         for i in range(10):
-            output_text2 += 'key down return \n delay 1'
+            output_text2 += 'key down return \n delay 1\n'
         # for packet in packets:
         #     p = packet.replace('\"', "'")
         #     output_text2 += 'keystroke "%s" \nkey down return \n' % p
