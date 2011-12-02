@@ -11,7 +11,7 @@ def test_compile():
 def test_keydown():
     s.keydown(["server.py"])
 
-test_compile()
-#test_keydown()
+#test_compile()
+test_keydown()
 
 
