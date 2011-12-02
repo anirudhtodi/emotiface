@@ -85,7 +85,11 @@ function compileFile(fileObj)
             success:checkCompileDone,
         });
     }
+    var filename = fileObj.filename;
+
     console.log("done with calls");
+
+    setTimeout("goGetGif('" + filename + "');",10000);
 }
 
 function checkCompileDone(returnVal)
