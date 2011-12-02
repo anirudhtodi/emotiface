@@ -89,7 +89,14 @@ function compileFile(fileObj)
     console.log("done with calls");
 }
 
-function checkCompileDone
+function checkCompileDone(returnVal)
+{
+
+
+
+
+
+}
 
 
 function makeScatterPlot(totalPackets)
