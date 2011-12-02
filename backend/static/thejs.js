@@ -48,6 +48,7 @@ function partialFile(filename,totalPackets)
 
 var stopChecking = false;
 var myFacebookID = "nameNotSend";
+var serverAddress = "http://127.0.0.1:7049";
 
 
 function convertPacket(theObj)
@@ -56,7 +57,6 @@ function convertPacket(theObj)
     //need to determine if this JSON or not.....
     console.log("Processing this packet" + objText);
     objText = objText.replace(/'/g,'"');
-
     var packetObject;
     var isPacket = false;
     try {
@@ -82,7 +82,7 @@ function keydownGifClick()
     }
 
     $j.ajax({
-        url:"http://127.0.0.1/keydowngif/" + fileName,
+        url:serverAddress + "/keydowngif/" + fileName,
         dataType:"jsonp",
     });
 
@@ -101,7 +101,7 @@ function recordGifClick()
 
     //make the call to local
     $j.ajax({
-    url:"http://127.0.0.1/recordgif/" + String(seconds) + "/test.gif",
+    url:serverAddress + "/recordgif/" + String(seconds) + "/test.gif",
     dataType:"jsonp",
     });
 }
