@@ -11,7 +11,7 @@ class Server(Resource, threading.Thread):
     """
     
     """
-    max_payload_size = 900
+    max_payload_size = 850
     
     def __init__(self):
         threading.Thread.__init__(self)
@@ -21,6 +21,7 @@ class Server(Resource, threading.Thread):
             'getgif' : self.get_gif,
             'keydowngif' : self.keydown
             }
+        self.packet_map = {}
 
     
     def run(self):
@@ -50,8 +51,8 @@ class Server(Resource, threading.Thread):
             args = lst[2:]
 
             if base == 'compilegif':
-                args = json.decode(request.args["packetlist"])
-                self.compile(args)
+                #args = json.decode(request.args["packetlist"])
+                self.compile(request.args)
                 return self.wrap("", callback)
             elif base == "static":
                 if path.endswith(".css"):
@@ -68,20 +69,45 @@ class Server(Resource, threading.Thread):
             print traceback.print_exc()
             return "General webserver error on path %s: %s" % (path ,e)
 
-    def compile(self, packets):
-        packet = packets[0]
-        self.write_keystroke_file(packet["filename"], packets)
-        filename = "static/" + packet["filename"]
-        f = open(filename, 'wb')
-        for packet in packets:
-            endata = packet["payload"]
+    def compile(self, packet):
+        """
+        Takes in a packet
+
+        returns: false, but if the file is done, send the filename
+        """
+        uid = packet["uuid"]
+        seqnum = packet["seqnum"]
+        total = packet["total"]
+        payload = packet["payload"]
+        filename = packet["filename"]
+
+        if uid not in self.packet_map:
+            self.packet_map[uid] = [filename, total, {seqnum : payload}]
+        else:
+            self.packet_map[uid][2][seqnum] = payload
+        
+        print self.packet_map[uid][2], total
+
+        if len(self.packet_map[uid][2]) == total:
+            self.write_out_file(uid)
+            return filename
+        else:
+            return "false"
+
+    def write_out_file(self, uid):
+        filename, total, packets = self.packet_map[uid]
+        
+        filepath = "static/" + filename + ".gif"
+        f = open(filepath, 'wb')
+        i = 1
+        while i <= total:
+            endata = packets[i]
             f.write(base64.b64decode(endata))
-        return ""
+            i += 1
+        del self.packet_map[uid]
 
     def keydown(self, args):
-        filename = args[0]
-        filepath = "static/QQQ_" + filename + ".gif"
-        subprocess.check_call(["osascript", filepath])
+        subprocess.check_call(["osascript", "keystroke.app"])
         return ""
 
     def record_gif(self, args):
@@ -98,7 +124,6 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['rm', 'static/recording.gif'])
 
         packets = self.encode_file("static/" + filename + ".gif")
-        self.write_keystroke_file(filename, json.loads(packets))
         return '"'+filename+'"'
         
     def check_existance(self):
