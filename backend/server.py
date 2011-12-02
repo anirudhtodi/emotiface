@@ -3,6 +3,7 @@ import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil,
 from twisted.internet import reactor
 from twisted.web import static, server
 from twisted.web.resource import Resource
+import binascii
 
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -87,12 +88,6 @@ class Server(Resource, threading.Thread):
         else:
             self.packet_map[uid][2][seqnum] = payload
         
-        print "ok so below is the length and the total"
-        print len(self.packet_map[uid][2]), " asd ", total
-        print filename
-        print type(total)
-        print "checking the if"
-
         if len(self.packet_map[uid][2]) == int(total):
             print " inside loop!!"
             self.write_out_file(uid)
@@ -103,13 +98,18 @@ class Server(Resource, threading.Thread):
     def write_out_file(self, uid):
         filename, total, packets = self.packet_map[uid]
         total = int(total)
+
         
         filepath = "static/" + filename + ".gif"
         f = open(filepath, 'wb')
         i = 1
         while i <= total:
-            endata = packets[i]
-            f.write(base64.b64decode(endata))
+            print "trying to add this packet"
+            print packets[str(i)]
+            print len(packets[str(i)])
+            endata = packets[str(i)]
+            #f.write(base64.urlsafe_b64decode(endata))
+            f.write(binascii.a2b_base64(endata))
             i += 1
         del self.packet_map[uid]
         return "whatt"
@@ -184,7 +184,10 @@ class Server(Resource, threading.Thread):
             data = f.read(self.max_payload_size)
             if data == '':
                 break
-            encoded = base64.b64encode(data)
+            #encoded = base64.urlsafe_b64encode(data)
+            encoded = binascii.b2a_base64(data)
+            encoded = encoded.replace('\n','')
+
             text += encoded
             
             if len(text) >= self.max_payload_size:
