@@ -65,8 +65,8 @@ class Server(Resource, threading.Thread):
 
     def compile(self, packets):
         packet = packets[0]
+        self.write_keystroke_file(packet["filename"], packets)
         filename = "static/" + packet["filename"]
-        #subprocess.check_call(["touch", "~/emotiface/backend/" + filename])
         f = open(filename, 'wb')
         for packet in packets:
             endata = packet["payload"]
@@ -74,7 +74,8 @@ class Server(Resource, threading.Thread):
 
     def keydown(self, args):
         filename = args[0]
-        filepath = "QQQ_" + filename
+        filepath = "static/QQQ_" + filename
+        print filepath
         subprocess.check_call(["osascript", filepath])
         return ""
 
@@ -138,7 +139,21 @@ class Server(Resource, threading.Thread):
 
         for p in packets:
             p["total"] = packetnum
+
+        self.write_keystroke_file(filename, packets)
         return json.dumps(packets)
+
+    def write_keystroke_file(self, filename, packets):
+        output_text = 'tell application "System Events"\n'
+        packets = [json.dumps(p) for p in packets]
+        output_text2 = ""
+        new_file_name = "QQQ_" + filename
+        f = open("static/" + new_file_name, 'w')
+        for packet in packets:
+            p = packet.replace('\"', "'")
+            output_text2 += 'keystroke "%s" \nkey down return \n' % p
+        output_text2 += 'end tell\n'
+        f.write(output_text + output_text2)
         
 
 if __name__ == "__main__":

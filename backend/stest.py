@@ -8,4 +8,10 @@ def test_compile():
     print "DECOMPILED:\n\n"
     decoded = s.compile(json.loads(encoded))
 
+def test_keydown():
+    s.keydown(["server.py"])
+
 test_compile()
+test_keydown()
+
+
