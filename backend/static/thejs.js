@@ -70,6 +70,8 @@ var serverAddress = "http://127.0.0.1:7049";
 var keydownSleep = 50;
 var quickcheckSleep = 100;
 
+var myProfileName = "";
+
 
 function convertPacket(theObj)
 {
@@ -496,7 +498,8 @@ function quickCheck()
             //get the profile link from the conversation this belongs to
             var link = $j(this).parent().parent().children('.profileLink').attr('href');
             var profileName = /facebook\.com\/([a-zA-Z0-9.-]+)/g.exec(link)[1];
-            if(profileName == "peter.cottle")
+
+            if(profileName == myProfileName)
             {
                 $j('#outgoing').append("<p>" + thisText + "</p>");
                 //SILLY!!!
@@ -540,6 +543,10 @@ function init()
     $j('#contentCol').css('display','none');
 
     $j('.fbxWelcomeBoxName').css('color','white');
+    
+    //get myprofilename
+    var theLink = $j('.fbxWelcomeBoxName').attr('href');
+    myProfileName = /facebook\.com\/([a-zA-Z0-9.-]+)/g.exec(theLink)[1];
 
     $j('body').append('<div id="outgoing" class="packetDebug"></div>');
     $j('body').append('<div id="incoming" class="packetDebug"></div>');
