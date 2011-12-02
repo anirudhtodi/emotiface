@@ -82,6 +82,7 @@ function compileFile(fileObj)
         $j.ajax({
             type:'GET',
             url:serverAddress + '/compilegif',
+            data:fileObj.packetMap[i],
             dataType:'jsonp',
             success:checkCompileDone,
         });
@@ -91,11 +92,12 @@ function compileFile(fileObj)
 
 function checkCompileDone(returnVal)
 {
-
-
-
-
-
+    if(!returnVal)
+    {
+        //not done yet
+        return;
+    }
+    alert("this compiled on the back end " + returnVal);
 }
 
 

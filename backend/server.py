@@ -76,15 +76,13 @@ class Server(Resource, threading.Thread):
 
         returns: false, but if the file is done, send the filename
         """
-        uid = packet["uuid"]
-        seqnum = packet["seqnum"]
-        total = packet["total"]
-        payload = packet["payload"]
-        filename = packet["filename"]
-
-        print payload
+        uid = packet["uuid"][0]
+        seqnum = packet["seqnum"][0]
+        total = packet["total"][0]
+        payload = packet["payload"][0]
+        filename = packet["filename"][0]
         
-        if uid not in self.packet_map:
+        if uid not in self.packet_map.keys():
             self.packet_map[uid] = [filename, total, {seqnum : payload}]
         else:
             self.packet_map[uid][2][seqnum] = payload
