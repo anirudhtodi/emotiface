@@ -84,12 +84,15 @@ class Server(Resource, threading.Thread):
         payload = packet["payload"][0]
         filename = packet["filename"][0]
         
+        print "Compiling:", seqnum, total
+
         if uid not in self.packet_map.keys():
             self.packet_map[uid] = [filename, total, {seqnum : payload}]
         else:
             self.packet_map[uid][2][seqnum] = payload
         
         if len(self.packet_map[uid][2]) == int(total):
+            print "Finished downloading", filename
             self.write_out_file(uid)
             return filename
         else:
@@ -131,6 +134,8 @@ class Server(Resource, threading.Thread):
         time.sleep(5)
         path = self.check_existance()
         self.block(path)
+
+
         shutil.move(path, "./movie.mov")
 
         movie = "movie.mov"
@@ -138,6 +143,10 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'static/recording.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['convert', '-resize', '60%','static/' + filename + '.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
+
+
+
+        #ffmpeg –i movie.wmv –an –r 5 –y capture%d.png
 
         f = open("static/" + filename + ".gif", 'rb') 
         packets = self.encode_file(filename, f)
