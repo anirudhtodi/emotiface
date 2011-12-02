@@ -82,6 +82,8 @@ class Server(Resource, threading.Thread):
         payload = packet["payload"]
         filename = packet["filename"]
 
+        print payload
+        
         if uid not in self.packet_map:
             self.packet_map[uid] = [filename, total, {seqnum : payload}]
         else:
