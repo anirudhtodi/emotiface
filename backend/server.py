@@ -201,7 +201,7 @@ class Server(Resource, threading.Thread):
 
     def filenames(self, args):
         files = glob.glob('static/*')
-        files = [":" + f[7:-4] for f in files if f.endswith(".gif")]
+        files = [f[7:-4] for f in files if f.endswith(".gif")]
         return json.dumps(files)
 
 if __name__ == "__main__":
