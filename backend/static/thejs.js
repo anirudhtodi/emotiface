@@ -129,7 +129,7 @@ function makeScatterPlot(totalPackets)
 
 /****** GLOBALS ****/
 
-var weAreTransferrign = false;
+var weAreTransferring = false;
 
 var progressScatterFilename= "";
 var stopChecking = false;
