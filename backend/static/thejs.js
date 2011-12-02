@@ -232,6 +232,11 @@ function getGifCallback(rawData)
 function keydownGifClick()
 {
     var fileName = $j('#fileInput').val();
+    goKeydownGif(fileName);
+}
+
+function goKeydownGif(fileName)
+{
     if(!$j('#fileInput').val())
     {
         alert("no file!");
@@ -463,6 +468,13 @@ function processHandshakePacket(packetObject)
         keydownCheck(filename,++toStartAt);
 
         return;
+    }
+    else if (packetObject.type=='requestFile')
+    {
+        var filename = packetObject.filename;
+        goKeydownGif(filename);
+
+
     }
     alert("uh oh something wrong with handshake type" + packetObject.type);
 }
