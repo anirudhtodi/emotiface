@@ -12,7 +12,7 @@ class Server(Resource, threading.Thread):
     """
     
     """
-    max_payload_size = 848
+    max_payload_size = 448
     
     def __init__(self):
         threading.Thread.__init__(self)
@@ -98,8 +98,6 @@ class Server(Resource, threading.Thread):
     def write_out_file(self, uid):
         filename, total, packets = self.packet_map[uid]
         total = int(total)
-
-        print "--------- COMPILING:", packets.keys()
         
         filepath = "static/" + filename + ".gif"
         f = open(filepath, 'wb')
@@ -110,7 +108,6 @@ class Server(Resource, threading.Thread):
             #print len(packets[str(i)])
             endata = packets[str(i)]
             decoded =  base64.urlsafe_b64decode(endata)
-            print "SIZE DIFFERENCE:", len(decoded) - len(endata)
             f.write(decoded)
 
             #f.write(binascii.a2b_base64(endata))
@@ -193,31 +190,9 @@ class Server(Resource, threading.Thread):
             if data == '':
                 break
             encoded = base64.urlsafe_b64encode(data)
-            #encoded = binascii.b2a_base64(data)
-            #encoded = encoded.replace('\n','')
-
-            text += encoded
-            
-            if len(text) >= self.max_payload_size:
-                payload = text[:self.max_payload_size]
-                text = text[self.max_payload_size:]
-                packetnum += 1
-                p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
-                packets.append(p)
-            
-        while len(text) > 0:
-            if len(text) >= self.max_payload_size:
-                payload = text[:self.max_payload_size]
-                text = text[self.max_payload_size:]
-                packetnum += 1
-                p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
-                packets.append(p)
-            else:
-                payload = text[:self.max_payload_size]
-                text = ""
-                packetnum += 1
-                p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
-                packets.append(p)
+            packetnum += 1
+            p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : encoded, "filename" : filename}
+            packets.append(p)
 
         for p in packets:
             p["total"] = packetnum
