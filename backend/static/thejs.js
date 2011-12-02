@@ -653,6 +653,8 @@ function requestGif(filename)
 
     toSend.handshake = true;
     toSend.uuid = randomID();
+    var theDate = new Date();
+    toSend.timestamp = theDate.getTime();
     toSend.type = "requestFile";
     toSend.filename = filename;
 
