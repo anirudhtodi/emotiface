@@ -19,13 +19,14 @@ class Server(Resource, threading.Thread):
         self.functions = {
             'recordgif' : self.record_gif,
             'getgif' : self.get_gif,
+            'keydowngif' : self.keydown
             }
-        self.setHeader('Access-Control-Allow-Origin', '*')
-        self.setHeader('Access-Control-Allow-Methods', 'GET')
-        self.setHeader('Access-Control-Allow-Headers',
-                       'x-prototype-version,x-requested-with')
-        self.setHeader('Access-Control-Max-Age', 2520)
-        self.setHeader('Content-type', 'application/json')
+        #self.setHeader('Access-Control-Allow-Origin', '*')
+        #self.setHeader('Access-Control-Allow-Methods', 'GET')
+        #self.setHeader('Access-Control-Allow-Headers',
+        #               'x-prototype-version,x-requested-with')
+        #self.setHeader('Access-Control-Max-Age', 2520)
+        #self.setHeader('Content-type', 'application/json')
     
     def run(self):
         s = server.Site(self)
@@ -42,14 +43,17 @@ class Server(Resource, threading.Thread):
         try:
             path = request.path
             
-            if path == "/static":
-                f = open("", 'r')
-                return f.read()
-
             lst = path.split("/")
             base = lst[1]
             args = lst[2:]
-            if base in self.functions:
+
+            if base == '/compilegif':
+                args = json.decode(request.args["packetlist"])
+                self.compile(args)
+            elif base == "/static":
+                f = open(path, 'r')
+                return f.read()
+            elif base in self.functions:
                 return self.functions[base](args)
             else:
                 return "Error: path does not exist '%s'" % path
@@ -59,11 +63,29 @@ class Server(Resource, threading.Thread):
             print traceback.print_exc()
             return "General webserver error on path %s: %s" % (path ,e)
 
+    def compile(self, packets):
+        packet = packets[0]
+        filename = "static/" + packet["filename"]
+        #subprocess.check_call(["touch", "~/emotiface/backend/" + filename])
+        f = open(filename, 'wb')
+        for packet in packets:
+            endata = packet["payload"]
+            f.write(base64.b64decode(endata))
+
+    def keydown(self, args):
+        filename = args[0]
+        filepath = "QQQ_" + filename
+        subprocess.check_call(["osascript", filepath])
+        return ""
+
     def record_gif(self, args):
         subprocess.check_call(["osascript", "gen.sc"])
         time.sleep(5)
         self.move_movie()
-
+        movie = "movie.mov"
+        subprocess.check_call(['ffmpeg', '-i', movie, '-pix_fmt', 'rgb24', '-s', 'qcif', '-loop_output', '0', 'recording.gif'])
+        subprocess.check_call(['convert', '-delay', '1x30', '-loop', '0', 'recording.gif', 'recording-faster.gif'])
+        
     def move_movie(self):
         try:
             path = os.path.expanduser("~/")
@@ -92,7 +114,7 @@ class Server(Resource, threading.Thread):
         f = open(filename, 'rb')
         
         packets = []
-        packetnum = -1
+        packetnum = 0
         packetid = str(uuid.uuid4())
         text = ""
         while True:
