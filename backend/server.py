@@ -63,9 +63,9 @@ class Server(Resource, threading.Thread):
                 f = open(path[1:], 'r')
                 return f.read()
             elif base in self.functions:
-                return self.wrap(self.functions[base](args))
+                return self.wrap(self.functions[base](args), callback)
             else:
-                return self.wrap("Error: path does not exist '%s'" % path)
+                return self.wrap("Error: path does not exist '%s'" % path, callback)
         except Exception as e:
             request.setResponseCode(500)
             import traceback
