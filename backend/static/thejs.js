@@ -48,20 +48,78 @@ function partialFile(filename,totalPackets)
             this.numPackets++;
             this.packetMap[packetObject.seqnum] = packetObject;
 
+            //also update the progress bar if necessary
+            if(progressScatterFilename == this.filename)
+            {
+                //find this packet seqnum and make it green
+                var theNum = packetObject.seqnum;
+                $j('#p' + String(theNum)).addClass('packetReceived');
+            }
+
             //now check if we are done
             if(this.numPackets == this.totalPackets)
             {
-                alert("This file is done!!");
                 this.isComplete = true;
                 //call to local!
+
+                //go call to compile
+                compileFile(this);
             }
         }
     }
 }
 
 
+function compileFile(fileObj)
+{
+    alert("compiling file");
+    console.log(fileObj);
+
+
+    for(var i = 1; i <= fileObj.totalPackets; i++)
+    {
+        //make an ajax call for each one of these...
+        $j.ajax({
+            type:'GET',
+            url:serverAddress + '/compilegif',
+            dataType:'jsonp',
+            success:checkCompileDone,
+        });
+    }
+    console.log("done with calls");
+}
+
+function checkCompileDone
+
+
+function makeScatterPlot(totalPackets)
+{
+    //check if it's there
+    if(!$j('.scatterDiv').length)
+    {
+        //add it
+        $j('body').append('<div class="scatterDiv"></div>');
+
+    }
+
+    //calcualte the size
+    var eachSize = scatterWidth/totalPackets;
+
+    var newWidth = Math.round(eachSize) * totalPackets;
+    $j('.scatterDiv').css('width',newWidth);
+
+    //now add all the packet things
+    var appendStr = "";
+    for(var i = 1; i <= totalPackets; i++)
+    {
+        appendStr = appendStr + '<div style="width:' + String(eachSize) + 'px" class="littlePacket" id="p' + String(i) + '"></div>';
+    }
+    $j('.scatterDiv').html(appendStr);
+}
+
 /****** GLOBALS ****/
 
+var progressScatterFilename= "";
 var stopChecking = false;
 var stopKeydown = false;
 var myFacebookID = "nameNotSend";
@@ -69,6 +127,8 @@ var serverAddress = "http://127.0.0.1:7049";
 
 var keydownSleep = 50;
 var quickcheckSleep = 100;
+
+var scatterWidth = 500;
 
 var myProfileName = "";
 
@@ -298,7 +358,7 @@ function processHandshakePacket(packetObject)
         //check if we are done
         if(!fileToCheck || !files[fileToCheck])
         {
-            alert("we haven't started the file " + fileToCheck + " yet");
+            //alert("we haven't started the file " + fileToCheck + " yet");
             return;
         }
         //alert("is it done? " + files[fileToCheck].isComplete);
@@ -330,7 +390,7 @@ function processHandshakePacket(packetObject)
             type:'GET',
             url:serverAddress + '/shortkeydowngif',
             dataType:'jsonp',
-            success:function(){alert("finished handshake back");},
+            success:function(){console.log("finished handshake back");},
         });
         return;
     }//if packetype is doneyet
@@ -418,8 +478,10 @@ function processPacket(packetObject)
     if(!files[packetObject.filename])
     {
         //no file, so go make one
-        alert("Had to make new file");
+        //make a div thing for the progress bar
         files[packetObject.filename] = new partialFile(packetObject.filename,packetObject.total);
+        progressScatterFilename = packetObject.filename;
+        makeScatterPlot(packetObject.total);
     }
 
     //now we are sure it's made, so go add this packet
