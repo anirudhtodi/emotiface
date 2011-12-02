@@ -144,10 +144,6 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(['convert', '-resize', '60%','static/' + filename + '.gif', 'static/' + filename + '.gif'])
         subprocess.check_call(['rm', 'static/recording.gif'])
 
-
-
-        #ffmpeg –i movie.wmv –an –r 5 –y capture%d.png
-
         f = open("static/" + filename + ".gif", 'rb') 
         packets = self.encode_file(filename, f)
         return '"'+filename+'"'
