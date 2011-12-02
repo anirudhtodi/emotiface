@@ -52,6 +52,7 @@ function partialFile(filename,totalPackets)
             if(this.numPackets == this.totalPackets)
             {
                 alert("This file is done!!");
+                this.isComplete = true;
                 //call to local!
             }
         }
@@ -408,7 +409,7 @@ function processPacket(packetObject)
 
     //i know it's technically not done yet but give me a break!
     processedPackets[uniqueID] = true;
-    alert("Processing new packet with seqnum " + packetObject.seqnum + " and uuid " + packetObject.uuid);
+    //alert("Processing new packet with seqnum " + packetObject.seqnum + " and uuid " + packetObject.uuid);
     
     //check if there's a partial file for this right now
     if(!files[packetObject.filename])
@@ -421,7 +422,7 @@ function processPacket(packetObject)
     //now we are sure it's made, so go add this packet
     files[packetObject.filename].addPacket(packetObject);
     //print the file
-    files[packetObject.filename].print();
+    //files[packetObject.filename].print();
 }
 
 
@@ -465,6 +466,7 @@ function typedSomething(eventObj)
     }
     matchingPart = regexResult[0];
     filename = regexResult[1];
+
     alert(matchingPart);
     alert(filename);
 
