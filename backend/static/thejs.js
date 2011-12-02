@@ -291,7 +291,7 @@ function recordBack(fileName)
 function processHandshakePacket(packetObject)
 {
     //right now only have a few types
-    alert("Processing handshake packet");
+    //alert("Processing handshake packet");
     if(packetObject.type=="doneyet")
     {
         var fileToCheck = packetObject.filename;
@@ -301,7 +301,7 @@ function processHandshakePacket(packetObject)
             alert("we haven't started the file " + fileToCheck + " yet");
             return;
         }
-        alert("is it done? " + files[fileToCheck].isComplete);
+        //alert("is it done? " + files[fileToCheck].isComplete);
         files[fileToCheck].print();
 
         if(files[fileToCheck].isComplete)
@@ -318,7 +318,7 @@ function processHandshakePacket(packetObject)
         toSend.handshake = true;
         toSend.uuid = randomID();
         toSend.type="whichToSend";
-        toSend.filename = filename;
+        toSend.filename = fileToCheck;
         toSend.startAt = toStartAt;
         //populate and send
 
