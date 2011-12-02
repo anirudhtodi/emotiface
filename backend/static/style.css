@@ -1,0 +1,59 @@
+
+
+.fbChatMessage {
+    color:#0066cc;
+}
+
+
+.packetDebug
+{
+    position:absolute;
+    top:1200px;
+    left:150px;
+    width:350px;
+    border:2px solid black;
+    background:#FFFFFF;
+    height:300px;
+    overflow:scroll;
+}
+
+#outgoing
+{
+    left:600px;
+}
+
+#ui
+{
+    position:absolute;
+    left:400px;
+    top:200px;
+    width:350px;
+    height:300px;
+    border:2px solid black;
+    background:#FFFFFF;
+}
+
+#gradient {
+    color:#FFFFFF;
+    padding:10px;
+    margin:0px;
+    position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 300px;
+	z-index:-1;
+	
+	background-image: -moz-linear-gradient(top, #0303ff, #ffffff);
+    background-image: -webkit-gradient(linear, center top, center bottom, from(#0303ff), to(#ffffff));
+    background-image: -o-linear-gradient(top, #0303ff, #ffffff);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0303ff', endColorstr='#ffffff');
+    /*INNER ELEMENTS MUST NOT BREAK THIS ELEMENTS BOUNDARIES*/
+    /*Element must have a height (not auto)*/
+    /*All filters must be placed together*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#0303ff', endColorstr='#ffffff')";
+    /*Element must have a height (not auto)*/
+    /*All filters must be placed together*/
+    background-image: linear-gradient(top, #0303ff, #ffffff);
+
+}
