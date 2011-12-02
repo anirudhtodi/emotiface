@@ -54,8 +54,8 @@ class Server(Resource, threading.Thread):
             args = lst[2:]
 
             if base == 'compilegif':
-                self.compile(request.args)
-                return self.wrap("", callback)
+                rval = self.compile(request.args)
+                return self.wrap(rval, callback)
             elif base == "static":
                 if path.endswith(".css"):
                     request.setHeader('content-type', 'text/css')
@@ -89,7 +89,6 @@ class Server(Resource, threading.Thread):
             self.packet_map[uid][2][seqnum] = payload
         
         if len(self.packet_map[uid][2]) == int(total):
-            print " inside loop!!"
             self.write_out_file(uid)
             return filename
         else:
