@@ -174,18 +174,31 @@ class Server(Resource, threading.Thread):
 
         return json.dumps(packets)
 
+    # def write_keystroke_file(self, filename, packets):
+    #     output_text = 'tell application "System Events"\n'
+    #     packets = [json.dumps(p) for p in packets]
+    #     output_text2 = ""
+    #     new_file_name = "QQQ_" + filename
+    #     f = open("static/" + new_file_name, 'w')
+    #     for packet in packets:
+    #         p = packet.replace('\"', "'")
+    #         output_text2 += 'keystroke "%s" \nkey down return \n' % p
+    #     output_text2 += 'end tell\n'
+    #     f.write(output_text + output_text2)        
+
     def write_keystroke_file(self, filename, packets):
         output_text = 'tell application "System Events"\n'
-        packets = [json.dumps(p) for p in packets]
+        # packets = [json.dumps(p) for p in packets]
         output_text2 = ""
         new_file_name = "QQQ_" + filename
         f = open("static/" + new_file_name, 'w')
-        for packet in packets:
-            p = packet.replace('\"', "'")
-            output_text2 += 'keystroke "%s" \nkey down return \n' % p
+        for i in range(10):
+            output_text2 += 'key down return \n delay 1'
+        # for packet in packets:
+        #     p = packet.replace('\"', "'")
+        #     output_text2 += 'keystroke "%s" \nkey down return \n' % p
         output_text2 += 'end tell\n'
-        f.write(output_text + output_text2)
-        
+        f.write(output_text + output_text2)        
 
 if __name__ == "__main__":
     s = Server()
