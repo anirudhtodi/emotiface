@@ -12,7 +12,7 @@ class Server(Resource, threading.Thread):
     """
     
     """
-    max_payload_size = 848
+    max_payload_size = 620
     
     def __init__(self):
         threading.Thread.__init__(self)
