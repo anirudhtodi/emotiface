@@ -129,6 +129,8 @@ function makeScatterPlot(totalPackets)
 
 /****** GLOBALS ****/
 
+var weAreTransferrign = false;
+
 var progressScatterFilename= "";
 var stopChecking = false;
 var stopKeydown = false;
@@ -237,6 +239,12 @@ function keydownGifClick()
 
 function goKeydownGif(fileName)
 {
+    if(weAreTransferring)
+    {
+        return;
+    }
+    weAreTransferring = true;
+
     if(!$j('#fileInput').val())
     {
         alert("no file!");
@@ -296,6 +304,7 @@ function keydownFinished(filename)
 {
     //obviously stop the current keydowns
     stopKeydown = true;
+    weAreTransferring = false;
 
     //we need to go ask if they are done with this file yet
     //build up a object which asks that
@@ -473,8 +482,6 @@ function processHandshakePacket(packetObject)
     {
         var filename = packetObject.filename;
         goKeydownGif(filename);
-
-
     }
     alert("uh oh something wrong with handshake type" + packetObject.type);
 }
