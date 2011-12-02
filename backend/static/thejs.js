@@ -50,13 +50,16 @@ var stopChecking = false;
 var myFacebookID = "nameNotSend";
 var serverAddress = "http://127.0.0.1:7049";
 
+var keydownSleep = 50;
+var quickcheckSleep = 100;
+
 
 function convertPacket(theObj)
 {
     objText = theObj.text();
     //need to determine if this JSON or not.....
     console.log("Processing this packet" + objText);
-    objText = objText.replace(/'/g,'"');
+    //objText = objText.replace(/'/g,'"');
     var packetObject;
     var isPacket = false;
     try {
@@ -78,25 +81,65 @@ function keydownGifClick()
     var fileName = $j('#fileInput').val();
     if(!$j('#fileInput').val())
     {
-        alert("wrong file!");
+        alert("no file!");
     }
     //focus on the first chat box??
+    if(!$j('.fbNubFlyoutInner').find('textarea'))
+    {
+        alert("open up a chat window silly!");
+        return;
+    }
+
     $j('.fbNubFlyoutInner').find('textarea').focus();
 
-    keydownCheck(fileName,0);
+    //do the first packet ourselves
+    var firstPacketObj = files[fileName].packetMap[0];
+    var firstPacketText = JSON.stringify(firstPacketObj);
+
+    //first, set the textarea to the value we want
 
     $j.ajax({
         type:'GET',
         url:serverAddress + "/keydowngif/" + fileName,
         dataType:"jsonp",
     });
+
+
+    //now wait for keydowns
+    keydownCheck(fileName,1);
 }
 
 function keydownCheck(filename,numPacket)
 {
     //check if it's nothing
+    console.log('waiting for next return key');
     var theVal = $j('.fbNubFlyoutInner').find('textarea').val();
-    alert(theVal);
+    console.log(theVal);
+    if(theVal)
+    {
+        //need to wait
+        var timeoutStr = "keydownCheck('" + filename + "'," + String(numPacket) + ");";
+        setTimeout(timeoutStr,keydownSleep);
+        return;
+    }
+    //actually put the next packet in
+    var packetText = JSON.stringify(files[filename].packetMap[numPacket]);
+    $j('.fbNubFlyoutInner').find('textarea').val(packetText);
+
+    //now call yourself again only if you have more packets
+    var totalPackets = files[filename].totalPackets;
+    //we are sending this packet next
+    numPacket++;
+    if(numPacket == totalPackets)
+    {
+        //we are done!
+        return;
+    }
+    else
+    {
+        //call yourself
+        keydownCheck(filename,numPacket);
+    }
 }
 
 
@@ -112,8 +155,18 @@ function recordGifClick()
         data:{'hi':'hello'},
         url:serverAddress + "/recordgif/" + fileName,
         dataType:'jsonp',
-        success:function(){alert("back");}
+        success:recordBack,
+        //success:function(){alert("back");}
     });
+}
+
+
+function recordBack(fileName)
+{
+    alert("just got this!");
+    alert(fileName);
+    $j('#ui').append('<img src="' + serverAddress + "/static/" + fileName + '.gif"/>');
+
 }
 
 function processPacket(packetObject)
@@ -246,7 +299,7 @@ function quickCheck()
         });
         all.addClass('read');
     }
-    setTimeout("quickCheck()",200);
+    setTimeout("quickCheck()",quickcheckSleep);
 }
 
 
