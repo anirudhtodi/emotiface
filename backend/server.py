@@ -187,10 +187,19 @@ class Server(Resource, threading.Thread):
                 p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
                 packets.append(p)
             
-        if len(text) > 0:
-            packetnum += 1
-            p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : text, "filename" : filename}
-            packets.append(p)
+        while len(text) > 0:
+            if len(text) >= self.max_payload_size:
+                payload = text[:self.max_payload_size]
+                text = text[self.max_payload_size:]
+                packetnum += 1
+                p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
+                packets.append(p)
+            else:
+                payload = text[:self.max_payload_size]
+                text = ""
+                packetnum += 1
+                p = {"uuid" : packetid, "seqnum" : packetnum, "payload" : payload, "filename" : filename}
+                packets.append(p)
 
         for p in packets:
             p["total"] = packetnum
