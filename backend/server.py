@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil
+import sys, threading, json, signal, uuid, base64, subprocess, os, time, shutil, glob
 from twisted.internet import reactor
 from twisted.web import static, server
 from twisted.web.resource import Resource
@@ -19,7 +19,9 @@ class Server(Resource, threading.Thread):
         self.functions = {
             'recordgif' : self.record_gif,
             'getgif' : self.get_gif,
-            'keydowngif' : self.keydown
+            'keydowngif' : self.keydown,
+            'shortkeydowngif' : self.shortkeydown,
+            'filenames' : self.filenames
             }
         self.packet_map = {}
 
@@ -109,6 +111,10 @@ class Server(Resource, threading.Thread):
         subprocess.check_call(["osascript", "keystroke.app"])
         return ""
 
+    def shortkeydown(self, args):
+        subprocess.check_call(["osascript", "shortkey.app"])
+        return ""
+
     def record_gif(self, args):
         filename = args[0]
         subprocess.check_call(["osascript", "gen.sc"])
@@ -190,7 +196,11 @@ class Server(Resource, threading.Thread):
             p["total"] = packetnum
 
         return json.dumps(packets)
-     
+
+    def filenames(self, args):
+        files = glob.glob('static/*')
+        files = [f[:-4] for f in files if f.endswith(".gif")]
+        return json.dumps(files)
 
 if __name__ == "__main__":
     s = Server()
