@@ -70,7 +70,7 @@ function partialFile(filename,totalPackets)
 
 function compileFile(_fileObj)
 {
-    alert("compiling file");
+    //alert("compiling file");
     $j('.scatterDiv').fadeOut();
     console.log(_fileObj);
 
@@ -102,6 +102,7 @@ function checkCompileDone(returnVal)
         return;
     }
     gifsWeHave[returnVal] = true;
+    embedGif(returnVal);
 }
 
 
