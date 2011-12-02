@@ -53,12 +53,7 @@ function partialFile(filename,totalPackets)
             {
                 alert("This file is done!!");
                 //call to local!
-                    $j.ajax({
-                        type:'GET',
-                        url:serverAddress + '/keydowngif/' + filename,
-                        dataType:'jsonp',
-                        success:function(){keydownFinished(filename);},
-                    });}
+            }
         }
     }
 }
@@ -206,6 +201,7 @@ function keydownFinished(filename)
     //    filename=the file
     toSend = new Object();
     toSend.handshake = true;
+    toSend.uuid = randomID();
     toSend.type = "doneyet";
     toSend.filename = filename;
 
@@ -296,6 +292,11 @@ function processHandshakePacket(packetObject)
     {
         var fileToCheck = packetObject.filename;
         //check if we are done
+        if(!fileToCheck || !files[fileToCheck])
+        {
+            alert("we haven't started the file " + fileToCheck + " yet");
+            return;
+        }
         alert("is it done? " + files[fileToCheck].isComplete);
         files[fileToCheck].print();
 
@@ -311,6 +312,7 @@ function processHandshakePacket(packetObject)
 
         var toSend = new Object();
         toSend.handshake = true;
+        toSend.uuid = randomID();
         toSend.type="whichToSend";
         toSend.filename = filename;
         toSend.startAt = toStartAt;
@@ -335,6 +337,13 @@ function processHandshakePacket(packetObject)
         var filename = packetObject.filename;
 
         stopKeydown = false;
+
+        //check if we have started this...?
+        if(!files[filename])
+        {
+            alert("cant resent this file " + filename + " cause havent started");
+            return;
+        }
        
         //set first, keydown will take care of the rest
         var firstPacketObj = files[filename].packetMap[toStartAt];
@@ -372,7 +381,13 @@ function processPacket(packetObject)
     if(packetObject.handshake)
     {
         //go process this
-        processHandshakePacket(packetObject);
+        //if it's not already been processed
+        if(!processedPackets[packetObject.uuid])
+        {
+            processedPackets[packetObject.uui] = true;
+            processHandshakePacket(packetObject);
+        }
+
         return;
     }
 
@@ -497,8 +512,21 @@ function quickCheck()
 }
 
 
+var autoCompleteFiles = new Object();
+function getFilesCallback(files) {
+    //var files = JSON.parse(rawData);
+    autoCompleteFiles = files;
+    $j('textarea.uiTextareaAutogrow.input').autocomplete({
+      source: files
+    });
+}
 
-
+function onMouseDown()
+{
+    $j('textarea.uiTextareaAutogrow.input').autocomplete({
+      source: files
+    });
+}
 
 function init()
 {
@@ -526,6 +554,13 @@ function init()
     myFacebookID = /facebook\.com\/([0-9a-zA-Z.-]+)/g.exec(homeLink)[1];
 
 
-    $j('textarea.uiTextareaAutogrow.input').live('keyup',typedSomething);
+    $j.ajax({
+        type:'GET',
+        url:serverAddress + "/filenames/",
+        dataType:"jsonp",
+      success:getFilesCallback,
+    });
 
+    $j('textarea.uiTextareaAutogrow.input').live('keyup',typedSomething);
+	$j('body').mousedown(onMouseDown);
 }
