@@ -83,7 +83,8 @@ function keydownGifClick()
     //focus on the first chat box??
     $j('.fbNubFlyoutInner').find('textarea').focus();
 
-    return;
+    keydownCheck(fileName,0);
+
     $j.ajax({
         type:'GET',
         url:serverAddress + "/keydowngif/" + fileName,
@@ -93,6 +94,7 @@ function keydownGifClick()
 
 function keydownCheck(filename,numPacket)
 {
+    //check if it's nothing
     var theVal = $j('.fbNubFlyoutInner').find('textarea').val();
     alert(theVal);
 }
