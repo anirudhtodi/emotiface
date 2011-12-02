@@ -47,11 +47,15 @@ class Server(Resource, threading.Thread):
             base = lst[1]
             args = lst[2:]
 
-            if base == '/compilegif':
+            print path, base
+
+            if base == 'compilegif':
                 args = json.decode(request.args["packetlist"])
                 self.compile(args)
-            elif base == "/static":
-                f = open(path, 'r')
+            elif base == "static":
+                if path.endswith(".css"):
+                    request.setHeader('content-type', 'text/css')
+                f = open(path[1:], 'r')
                 return f.read()
             elif base in self.functions:
                 return self.functions[base](args)
