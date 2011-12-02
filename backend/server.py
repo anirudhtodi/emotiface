@@ -34,17 +34,20 @@ class Server(Resource, threading.Thread):
     def render_POST(self, request):
         return self.render_GET(request)
 
+    def wrap(self, data, callback):
+        return callback + "(" + data + ")"
+
     def render_GET(self, request):
         try:
             path = request.path
+            callback = request.args['callback']
 
-
-            request.setHeader('Access-Control-Allow-Origin', '*')
-            request.setHeader('Access-Control-Allow-Methods', 'GET')
-            request.setHeader('Access-Control-Allow-Headers',
-                           'x-prototype-version,x-requested-with')
-            request.setHeader('Access-Control-Max-Age', 2520)
-            request.setHeader('Content-type', 'application/json')
+            #request.setHeader('Access-Control-Allow-Origin', '*')
+            #request.setHeader('Access-Control-Allow-Methods', 'GET')
+            #request.setHeader('Access-Control-Allow-Headers',
+            #               'x-prototype-version,x-requested-with')
+            #request.setHeader('Access-Control-Max-Age', 2520)
+            #request.setHeader('Content-type', 'application/json')
 
             lst = path.split("/")
             base = lst[1]
@@ -53,15 +56,16 @@ class Server(Resource, threading.Thread):
             if base == 'compilegif':
                 args = json.decode(request.args["packetlist"])
                 self.compile(args)
+                return self.wrap("", callback)
             elif base == "static":
                 if path.endswith(".css"):
                     request.setHeader('content-type', 'text/css')
-                f = open(path[1:], 'r')
+                f = open(path[1:            print path, request.args], 'r')
                 return f.read()
             elif base in self.functions:
-                return self.functions[base](args)
+                return self.wrap(self.functions[base](args))
             else:
-                return "Error: path does not exist '%s'" % path
+                return self.wrap("Error: path does not exist '%s'" % path)
         except Exception as e:
             request.setResponseCode(500)
             import traceback
