@@ -12,7 +12,7 @@ class Server(Resource, threading.Thread):
     """
     
     """
-    max_payload_size = 800
+    max_payload_size = 850
     
     def __init__(self):
         threading.Thread.__init__(self)
@@ -108,7 +108,12 @@ class Server(Resource, threading.Thread):
             print packets[str(i)]
             print len(packets[str(i)])
             endata = packets[str(i)]
+
+            if len(endata) % 4 != 0:
+                print "INCORRECT PACKET LENGTH: ", len(endata)
+
             f.write(base64.urlsafe_b64decode(endata))
+
             #f.write(binascii.a2b_base64(endata))
             i += 1
         print "OK I just finished encoding that thing"
