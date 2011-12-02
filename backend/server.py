@@ -40,7 +40,10 @@ class Server(Resource, threading.Thread):
     def render_GET(self, request):
         try:
             path = request.path
-            callback = request.args['callback']
+            if 'callback' in request.args:
+                callback = request.args['callback'][0]
+            else:
+                callback = ''
 
             #request.setHeader('Access-Control-Allow-Origin', '*')
             #request.setHeader('Access-Control-Allow-Methods', 'GET')
